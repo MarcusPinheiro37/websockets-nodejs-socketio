@@ -12,11 +12,32 @@ const io = new Server(servidorHttp, {
     }
 });
 
-io.on('connection', (socket) => {
+const documentos = [
+    {
+        nome: 'JavaScript',
+        texto: 'texto javascript'
+    },
+    {
+        nome: 'Node',
+        texto: 'texto node'
+    },
+    {
+        nome: 'Socket.io',
+        texto: 'texto socket.io'
+    },
+];
+
+export default io.on('connection', (socket) => {
     console.log('Um cliente se conectou. ID:', socket.id);
-    
-    socket.on('selecionar_documento', (nomeDocumento) => {
+
+    socket.on('selecionar_documento', (nomeDocumento, devolverTexto) => {
+        
         socket.join(nomeDocumento);
+        const documento = encontrarDocumento(nomeDocumento);
+
+        if(documento) {
+            devolverTexto(documento.texto);
+        }
     });
 
     socket.on('texto_editor', ({ texto, nomeDocumento }) => {
@@ -28,4 +49,10 @@ io.on('connection', (socket) => {
         Motivo: ${motivo}`);
     });
 });
-export default io;
+
+function encontrarDocumento(nomeDocumento){
+    const documento = documentos.find((documento) => {
+        return documento.nome === nomeDocumento;
+    });
+    return documento;
+}
