@@ -2,6 +2,7 @@
 import 'dotenv/config';
 import { Server } from 'socket.io';
 import servidorHttp from './app.js';
+import DocumentoController from './controllers/documentoController.js';
 
 const io = new Server(servidorHttp, {
     cors: {
@@ -12,36 +13,27 @@ const io = new Server(servidorHttp, {
     }
 });
 
-const documentos = [
-    {
-        nome: 'JavaScript',
-        texto: 'texto javascript'
-    },
-    {
-        nome: 'Node',
-        texto: 'texto node'
-    },
-    {
-        nome: 'Socket.io',
-        texto: 'texto socket.io'
-    },
-];
+// let documentos = DocumentoController.listaDocumentos;
 
 export default io.on('connection', (socket) => {
     console.log('Um cliente se conectou. ID:', socket.id);
 
-    socket.on('selecionar_documento', (nomeDocumento, devolverTexto) => {
+    socket.on('selecionar_documento', async (nomeDocumento, devolverTexto) => {
         
         socket.join(nomeDocumento);
-        const documento = encontrarDocumento(nomeDocumento);
+        const documento = await DocumentoController.listaUmDocumento(nomeDocumento);
 
         if(documento) {
             devolverTexto(documento.texto);
         }
     });
 
-    socket.on('texto_editor', ({ texto, nomeDocumento }) => {
-        socket.to(nomeDocumento).emit('texto_editor_clientes', texto);
+    socket.on('texto_editor', async ({ texto, nomeDocumento })  => {
+        const documento = await DocumentoController.atualizaDocumento({nomeDocumento, texto});
+
+        if(documento){
+            socket.to(nomeDocumento).emit('texto_editor_clientes', texto);
+        }
     });
 
     socket.on('disconnect', (motivo) => {
@@ -49,10 +41,3 @@ export default io.on('connection', (socket) => {
         Motivo: ${motivo}`);
     });
 });
-
-function encontrarDocumento(nomeDocumento){
-    const documento = documentos.find((documento) => {
-        return documento.nome === nomeDocumento;
-    });
-    return documento;
-}
