@@ -7,6 +7,16 @@ class DocumentoController {
         return listaDocumentos;
     }
 
+    // Caso vá fazer com api request
+    static async listaDocumentosReq(req, res){
+        try {
+            const listaDocumentos = await documento.find();
+            res.status(200).json(listaDocumentos);
+        } catch (error) {
+            res.status(500).send(error);
+        }
+    }
+
     static async listaUmDocumento(nome){
         const listaDocumento = await documento.findOne({ nome });
         return listaDocumento;
@@ -17,26 +27,32 @@ class DocumentoController {
         const documentoAtualizado = await documento.findOneAndUpdate({nome: nomeDocumento}, {texto});
         return documentoAtualizado;
     }
-    // static async buscaDocumento(req, res){
-    //     try {
-    //         const listaDocumento = await documento.findById(req.params.id);            
-    //         if(listaDocumento !== null){
-    //             res.status(200).json(listaDocumento);
-    //         } else {
-    //             res.status(404).send('Documento nao encontrado');
-    //         }
-    //     } catch (error) {
-    //         res.status(500).send(error);
-    //     }
-    // }
 
-    static async adicionaDocumentoes(req, res){
+    static async adicionaDocumentos(nome){
+        const novoDocumento = await documento.bulkWrite([
+            {
+                insertOne: {
+                    document: {nome, texto: `Texto inicial de ${nome}`}
+                }
+            }
+        ]);
+        return novoDocumento;
+    }
+
+    static async deletaDocumento(nome){
+        const deletaDoc = await documento.deleteOne({nome});
+        return deletaDoc;
+    }
+
+    static async deletaErros(req, res){
+        const { nome } = req.query;
         try {
-            const novoDocumento = await documento.create(req.body);
-            res.status(201).json({ message: 'Inserido com sucesso', documento: novoDocumento });        
-        } catch(error) {
-            res.status(500).send(error);
+            const documentoDeletado = await documento.deleteMany({nome});
+            res.status(201).json({message: `Documentos com o nome ${nome} foram deletados`, documentoDeletado});
+        } catch (error) {
+            res.status(500).send('Erro ao deletar');
         }
+        
     }
 }
 
