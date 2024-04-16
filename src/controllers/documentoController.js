@@ -1,4 +1,4 @@
-import  documento  from '../models/Documento.js';
+import  documento  from '../database/models/Documento.js';
 
 class DocumentoController {
 
