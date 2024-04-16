@@ -11,6 +11,10 @@ function emitirAdicionarDocumento(nome){
     socket.emit('adicionar_documento', nome);
 }
 
+socket.on('adicionar_documento_interface', (nome) => {
+    inserirLinkDocumento(nome);
+});
+
 socket.on('documento_existente', (nome) => {
     alert(`Documento ${nome} já existe`);
 });
@@ -19,8 +23,5 @@ socket.on('excluir_documento_sucesso', (nome) =>{
     removerLinkDocumento(nome);
 });
 
-socket.on('adicionar_documento_interface', (nome) => {
-    inserirLinkDocumento(nome);
-});
 
 export { emitirAdicionarDocumento };
