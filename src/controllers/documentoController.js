@@ -1,34 +1,18 @@
-import  documento  from '../database/models/Documento.js';
+import documento from '../database/models/Documento.js';
+import Controller from './Controller.js';
 
-class DocumentoController {
-
-    static async listaDocumentos(){
-        const listaDocumentos = await documento.find();
-        return listaDocumentos;
-    }
-
-    // Caso vá fazer com api request
-    static async listaDocumentosReq(req, res){
-        try {
-            const listaDocumentos = await documento.find();
-            res.status(200).json(listaDocumentos);
-        } catch (error) {
-            res.status(500).send(error);
-        }
-    }
-
-    static async listaUmDocumento(nome){
-        const listaDocumento = await documento.findOne({ nome });
-        return listaDocumento;
+class DocumentoController extends Controller {
+    constructor(){
+        super(documento);
     }
     
-    static async atualizaDocumento(dados){
+    async atualizaDocumento(dados){
         const { nomeDocumento, texto } = dados;
         const documentoAtualizado = await documento.findOneAndUpdate({nome: nomeDocumento}, {texto});
         return documentoAtualizado;
     }
 
-    static async adicionaDocumentos(nome){
+    async adicionaDocumentos(nome){
         const novoDocumento = await documento.bulkWrite([
             {
                 insertOne: {
@@ -39,7 +23,7 @@ class DocumentoController {
         return novoDocumento;
     }
 
-    static async deletaDocumento(nome){
+    async deletaDocumento(nome){
         const deletaDoc = await documento.deleteOne({nome});
         return deletaDoc;
     }
