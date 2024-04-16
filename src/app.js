@@ -1,6 +1,6 @@
 import express from 'express';
 import routes from './routes/index.js';
-import conectaDataBase from './config/dbConnect.js';
+import conectaDataBase from './database/config/dbConnect.js';
 import http from 'http';
 
 (async () => {
