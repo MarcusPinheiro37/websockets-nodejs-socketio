@@ -5,6 +5,7 @@ import servidorHttp from './app.js';
 import registrarEventosDocumento from './registrarEventos/documento.js';
 import registrarEventosInicio from './registrarEventos/inicio.js';
 import registrarEventosCadastro from './registrarEventos/cadastro.js';
+import registrarEventosLogin from './registrarEventos/login.js';
 
 const io = new Server(servidorHttp, {
     cors: {
@@ -15,12 +16,12 @@ const io = new Server(servidorHttp, {
     }
 });
 
-// let documentos = DocumentoController.listaDocumentos;
-
 export default io.on('connection', (socket) => {
     console.log('Um cliente se conectou. ID:', socket.id);
     
     registrarEventosCadastro(socket, io);
+
+    registrarEventosLogin(socket, io);
 
     registrarEventosInicio(socket, io);
     
